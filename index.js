@@ -382,13 +382,13 @@ async function registrarArticulosEnTablero(tableroId, articulos) {
   try {
     const batchSize = 35;
     const totalArticulos = articulos.length;
+    const existingGroups = await obtenerGruposExistentes(tableroId);
     for (let startIndex = 0; startIndex < totalArticulos; startIndex += batchSize) {
       const endIndex = Math.min(startIndex + batchSize, totalArticulos);
       const batch = articulos.slice(startIndex, endIndex);
       const promesasRegistro = batch.map(async (articulo) => {
         const proveedor = articulo.proveedor || 'SIN ASIGNAR'
-        const updatedGroups = await obtenerGruposExistentes(tableroId);
-        const grupoExistente = updatedGroups.find(group => group.title === proveedor);
+        const grupoExistente = existingGroups.find(group => group.title === proveedor);
         if (grupoExistente) {
           const nombreArticulo = articulo.articulo;
           const articuloNombreEscapado = escaparComillasDobles(nombreArticulo);
@@ -442,8 +442,10 @@ async function registrarArticulosEnTablero(tableroId, articulos) {
       });
       //Esperar a que se cumplan todas las promesas
       await Promise.all(promesasRegistro);
-      //Esperar 5000 milisegundos entre lotes de registros.
-      await new Promise(resolve => setTimeout(resolve, 8000));
+      //Esperar entre lotes si aún faltan más
+      if (endIndex < totalArticulos) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
     console.log('Todos los artículos se han agregado correctamente.');
   } catch (error) {
@@ -511,8 +513,8 @@ async function registrarKitsAlmacen(tableroId, allKits, cantidadProducto, idOP) 
       const batch = allKits.slice(startIndex, endIndex);
       for (const kit of batch) {
         await registrarKit(kit);
-        // Esperar 3000 milisegundos entre kits
-        await new Promise(resolve => setTimeout(resolve, 2200));
+        // Esperar 300 milisegundos entre kits
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
     }
 
@@ -575,8 +577,8 @@ async function registrarArticulosAlmacen(idKit, articulos, cantidad, cantidadPro
       const batch = articulos.slice(startIndex, endIndex);
       for (const articulo of batch) {
         await registrarArticulo(articulo);
-        // Esperar 2000 milisegundos entre artículos
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        // Esperar 200 milisegundos entre artículos
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
     }
 
