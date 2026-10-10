@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ricardomtnez/transtools_warehouse.git"
+    "url": "git+https://github.com/zekivelez/ServerTrantoolsOP.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Ezequiel Velez",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ricardomtnez/transtools_warehouse/issues"
+    "url": "https://github.com/zekivelez/ServerTrantoolsOP/issues"
   },
-  "homepage": "https://github.com/ricardomtnez/transtools_warehouse#readme",
+  "homepage": "https://github.com/zekivelez/ServerTrantoolsOP#readme",
   "dependencies": {
     "axios": "^1.5.1",
     "body-parser": "^1.20.2",
