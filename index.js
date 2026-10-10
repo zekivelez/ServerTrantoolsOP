@@ -8,6 +8,7 @@ const imagenes = require('./imagenes.js'); // Importación en CommonJS
 
 const app = express();
 const port = process.env.PORT || 4000;
+const MONDAY_API_TOKEN = process.env.MONDAY_API || 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM4MDk5MjcyMiwiYWFpIjoxMSwidWlkIjo0MDY5NzEwMSwiaWFkIjoiMjAyNC0wNy0wNVQyMTowMjozMi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA5Mjg0OTUsInJnbiI6InVzZTEifQ.55PVw2YfNZ7d7DUgqfEOl4vLHlh3MU5QGnwReMl-NpQ';
 
 app.use(bodyParser.json());
 
@@ -423,7 +424,7 @@ async function registrarArticulosEnTablero(tableroId, articulos) {
             const respuesta = await axios.post('https://api.monday.com/v2', solicitud, {
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM4MDk5MjcyMiwiYWFpIjoxMSwidWlkIjo0MDY5NzEwMSwiaWFkIjoiMjAyNC0wNy0wNVQyMTowMjozMi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA5Mjg0OTUsInJnbiI6InVzZTEifQ.55PVw2YfNZ7d7DUgqfEOl4vLHlh3MU5QGnwReMl-NpQ'
+                'Authorization': MONDAY_API_TOKEN
               },
               timeout: 25000,  // Tiempo de espera en milisegundos (10 segundos)
               family: 4  // Añade esta línea para usar IPv4
@@ -484,13 +485,13 @@ async function registrarKitsAlmacen(tableroId, allKits, cantidadProducto, idOP) 
         const respuesta = await axios.post('https://api.monday.com/v2', solicitud, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM4MDk5MjcyMiwiYWFpIjoxMSwidWlkIjo0MDY5NzEwMSwiaWFkIjoiMjAyNC0wNy0wNVQyMTowMjozMi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA5Mjg0OTUsInJnbiI6InVzZTEifQ.55PVw2YfNZ7d7DUgqfEOl4vLHlh3MU5QGnwReMl-NpQ',
+            'Authorization': MONDAY_API_TOKEN,
             'API-Version': '2026-01'
           },
           timeout: 25000,  // Tiempo de espera en milisegundos (10 segundos)
           family: 4  // Añade esta línea para usar IPv4
         });
-        if (respuesta.data && respuesta.data.data.create_item) {
+        if (respuesta.data && respuesta.data.data && respuesta.data.data.create_item) {
           if (kit.id != "") {
             var arrayArticulos = await getArticulosAlmacen(kit.id);
             const idKit = respuesta.data.data.create_item.id;
@@ -498,7 +499,7 @@ async function registrarKitsAlmacen(tableroId, allKits, cantidadProducto, idOP) 
             await registrarArticulosAlmacen(idKit, arrayArticulos, kit.cantidad, cantidadProducto, idOP);
           }
         } else {
-          console.error(`Error al agregar el kit "${kit.configuracion}".`);
+          console.error(`Error al agregar el kit "${kit.configuracion}":`, respuesta.data ? respuesta.data.errors : '');
         }
       } catch (error) {
         console.error(`Error al agregar el kit "${kit.configuracion}":`, error);
@@ -556,7 +557,7 @@ async function registrarArticulosAlmacen(idKit, articulos, cantidad, cantidadPro
         const respuesta = await axios.post('https://api.monday.com/v2', solicitud, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM4MDk5MjcyMiwiYWFpIjoxMSwidWlkIjo0MDY5NzEwMSwiaWFkIjoiMjAyNC0wNy0wNVQyMTowMjozMi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA5Mjg0OTUsInJnbiI6InVzZTEifQ.55PVw2YfNZ7d7DUgqfEOl4vLHlh3MU5QGnwReMl-NpQ',
+            'Authorization': MONDAY_API_TOKEN,
             'API-Version': '2026-01'
           },
           timeout: 45000,  // Tiempo de espera en milisegundos (10 segundos)
@@ -1101,7 +1102,7 @@ async function subirArchivoAMonday(pulseId, pdfBase64, nombreArchivo) {
     const response = await axios.post('https://api.monday.com/v2/file', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM4MDk5MjcyMiwiYWFpIjoxMSwidWlkIjo0MDY5NzEwMSwiaWFkIjoiMjAyNC0wNy0wNVQyMTowMjozMi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA5Mjg0OTUsInJnbiI6InVzZTEifQ.55PVw2YfNZ7d7DUgqfEOl4vLHlh3MU5QGnwReMl-NpQ' //API key
+        'Authorization': MONDAY_API_TOKEN
       },
       timeout: 25000,  // Tiempo de espera en milisegundos (10 segundos)
       family: 4  // Añade esta línea para usar IPv4
@@ -1120,7 +1121,7 @@ async function sendMondayApiRequest(query, version) {
     }, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjM4MDk5MjcyMiwiYWFpIjoxMSwidWlkIjo0MDY5NzEwMSwiaWFkIjoiMjAyNC0wNy0wNVQyMTowMjozMi4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTA5Mjg0OTUsInJnbiI6InVzZTEifQ.55PVw2YfNZ7d7DUgqfEOl4vLHlh3MU5QGnwReMl-NpQ',
+        'Authorization': MONDAY_API_TOKEN,
         'API-Version': version
       },
       timeout: 45000, // Establecer un tiempo de espera de 5 segundos
